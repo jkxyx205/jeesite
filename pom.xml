@@ -604,11 +604,16 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.2</version>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+		<!--<dependency>
 			<groupId>com.ckfinder</groupId>
 			<artifactId>apache-ant-zip</artifactId>
 			<version>2.3</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.ckfinder</groupId>
 			<artifactId>ckfinder</artifactId>
@@ -643,7 +648,7 @@
 		<dependency>
 			<groupId>bitwalker</groupId>
 			<artifactId>UserAgentUtils</artifactId>
-			<version>1.13</version>
+			<version>1.18</version>
 		</dependency>
 		
 		<!-- 自定义jar依赖包
@@ -736,7 +741,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
+					<!--<encoding>${project.build.sourceEncoding}</encoding>-->
 				</configuration>
 				<!-- <executions>
 					<execution>
@@ -882,7 +887,7 @@
 			</plugin>
 			
 			<!-- jetty插件 -->
-			<plugin>
+			<!--<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
@@ -902,7 +907,7 @@
 						</systemProperty>
 					</systemProperties>
 				</configuration>
-			</plugin>
+			</plugin>-->
 			
 			<!-- resource插件 -->
 			<plugin>
@@ -941,8 +946,8 @@
 		</plugins>
 	</build>
 	
-	<profiles>
-		<!-- 初始化数据库 -->			
+	<!--<profiles>
+		&lt;!&ndash; 初始化数据库 &ndash;&gt;
 		<profile>
 			<id>init-db</id>
 			<dependencies>
@@ -966,14 +971,14 @@
 						<configuration>
 							<target>
 								
-								<!-- mysql -->
+								&lt;!&ndash; mysql &ndash;&gt;
 								<property name="dbunit.datatype" value="org.dbunit.ext.mysql.MySqlDataTypeFactory" />
 								
-								<!-- mssql
-								<property name="dbunit.datatype" value="org.dbunit.ext.mssql.MsSqlDataTypeFactory" /> -->
+								&lt;!&ndash; mssql
+								<property name="dbunit.datatype" value="org.dbunit.ext.mssql.MsSqlDataTypeFactory" /> &ndash;&gt;
 								
-								<!-- oracle
-								<property name="dbunit.datatype" value="org.dbunit.ext.oracle.Oracle10DataTypeFactory" /> -->
+								&lt;!&ndash; oracle
+								<property name="dbunit.datatype" value="org.dbunit.ext.oracle.Oracle10DataTypeFactory" /> &ndash;&gt;
 								
 								<property file="src/main/resources/jeesite.properties" />
 								<sql driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}" password="${jdbc.password}" 
@@ -995,13 +1000,13 @@
 								
 								<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask" classpathref="maven.test.classpath" />
 								
-								<!-- mysql、mssql -->
+								&lt;!&ndash; mysql、mssql &ndash;&gt;
 								<dbunit driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
 									 password="${jdbc.password}">
 								
-								<!-- oracle
+								&lt;!&ndash; oracle
 								<dbunit driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
-									password="${jdbc.password}" schema="${jdbc.username}" > -->
+									password="${jdbc.password}" schema="${jdbc.username}" > &ndash;&gt;
 									
 									<dbconfig>
 										<property name="datatypeFactory" value="${dbunit.datatype}" />
@@ -1018,7 +1023,7 @@
 				</plugins>
 			</build>
 		</profile>
-	</profiles>
+	</profiles>-->
 	
 	<!-- 开发者信息 -->
 	<developers>  
