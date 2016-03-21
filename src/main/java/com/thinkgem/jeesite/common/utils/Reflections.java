@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -68,7 +69,8 @@ public class Reflections {
 	 * 直接读取对象属性值, 无视private/protected修饰符, 不经过getter函数.
 	 */
 	public static Object getFieldValue(final Object obj, final String fieldName) {
-		Field field = getAccessibleField(obj, fieldName);
+        if (obj instanceof Map) //add by Rick.Xu 20160320
+            return  ((Map)obj).get(fieldName);		Field field = getAccessibleField(obj, fieldName);
 
 		if (field == null) {
 			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + obj + "]");
