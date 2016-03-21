@@ -1,12 +1,15 @@
 package com.thinkgem.jeesite.common.service;
 
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.SQL.SqlFormatter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +26,17 @@ import java.util.*;
 public class QueryService {
     private static Logger logger = LoggerFactory.getLogger(QueryService.class);
 
+    public static final String PARAM_IN_SEPERATOR = ";";
+
     private static final String SQL_ID = "sqlId";
 
     private static final String PAGE_OBJECT_PROP = "page";
 
     @Resource
     private SqlSessionFactory sqlSessionFactory;
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
 
     /***
      * usually used by web site
@@ -43,7 +51,6 @@ public class QueryService {
     public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String sqlId, Map<String, Object> supplementParams)  {
         Map<String, Object> params  = getParametersAsMap(true, request);
         params.putAll(supplementParams);
-
         if (StringUtils.isNotBlank(sqlId))
             params.put(SQL_ID, sqlId);
 
@@ -110,5 +117,57 @@ public class QueryService {
             }
         }
         return map;
+    }
+
+    private String getQueryStringBySqlId(String sqlId, Map<String, Object> param) {
+        MappedStatement mappedStatement = sqlSessionFactory.getConfiguration().getMappedStatement(sqlId);
+        String sql = mappedStatement.getBoundSql(param).getSql();
+        return sql;
+    }
+
+    public <T> T queryForSpecificParamSQL(String sql,
+                                          Map<String, Object> param,
+                                          String paramInSeperator,
+                                          JdbcTemplateExecutor<T> jdbcTemplateExecutor) {
+        Map<String, Object> formatMap = new HashMap<String, Object>();
+        String formatSql = SqlFormatter.formatSql(sql, param, formatMap,
+                paramInSeperator);
+
+        Object[] args = NamedParameterUtils.buildValueArray(formatSql,
+                formatMap);
+
+        return jdbcTemplateExecutor.query(jdbcTemplate, formatSql, args);
+    }
+
+    public <T> T queryForSpecificParam(String queryName,
+                                       Map<String, Object> param,
+                                       JdbcTemplateExecutor<T> jdbcTemplateExecutor) {
+        return queryForSpecificParam(queryName, param, PARAM_IN_SEPERATOR,
+                jdbcTemplateExecutor);
+    }
+
+    public <T> T queryForSpecificParam(String queryName,
+                                       Map<String, Object> param, String paramInSeperator,
+                                       JdbcTemplateExecutor<T> jdbcTemplateExecutor) {
+        String sql = getQueryStringBySqlId(queryName, param);
+        return  queryForSpecificParamSQL(sql, param, paramInSeperator,jdbcTemplateExecutor);
+    }
+
+    public long queryForSpecificParamCount(String queryName,
+                                           Map<String, Object> param) {
+        String sql = getQueryStringBySqlId(queryName, param);
+        return  queryForSpecificParamSQL(sql, param, PARAM_IN_SEPERATOR,new JdbcTemplateExecutor<Long>() {
+
+            @Override
+            public Long query(JdbcTemplate jdbcTemplate, String queryString, Object[] args) {
+                return jdbcTemplate.queryForObject(queryString, args, Long.class);
+            }
+        });
+        //
+    }
+
+    public interface JdbcTemplateExecutor<T> {
+        public T query(JdbcTemplate jdbcTemplate, String queryString,
+                       Object[] args);
     }
 }
