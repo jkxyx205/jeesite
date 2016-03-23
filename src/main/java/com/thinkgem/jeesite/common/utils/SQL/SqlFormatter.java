@@ -1,5 +1,6 @@
 package com.thinkgem.jeesite.common.utils.SQL;
 
+import com.thinkgem.jeesite.common.vo.PageModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class SqlFormatter {
 	
 	private static final String HOLDER_REGEX = "(([(]\\s*:\\w+\\s*[)])|(:\\w+))";
 	
-	private static final String PARAM_REGEX = ":\\w+";
+	public static final String PARAM_REGEX = ":\\w+";
 	
 	private static final String OPER_IN_REGEX = "(?i)(\\s+in|\\s+not\\s+in)";
 	
@@ -138,7 +139,9 @@ public class SqlFormatter {
 				}
 			}
 		}
-		return srcSql;
+
+        //mysql变量变成?
+		return changeInSQL(srcSql);
 	}
 
 	public static String formatSqlCount(String srcSql) {
@@ -182,7 +185,8 @@ public class SqlFormatter {
 				 String matchRet3 = mat3.group().trim();
 				 holder.holder = matchRet3.substring(1);
 			 }
-		}
+            paramList.add(holder);
+        }
 		logger.debug(paramList.toString());
 		return paramList;
 	}
@@ -201,22 +205,23 @@ public class SqlFormatter {
 			return new StringBuilder().append(full).append("/").append(key).append("/").append(oper).append("/").append(holder).toString();
 		}
 	}
-   
-   public static String pageSql(String sql, int page, int rows) {
-		StringBuilder sb = new  StringBuilder();
-		
-		int startIndex = 0;
-		int endIndex = 0;
-		
-		startIndex = (page-1) * rows;
-			endIndex = startIndex + rows;
-		//
-		sb.append("SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (SELECT * FROM ")
-		  .append("(").append(sql).append(") temp_");
-		
-		sb.append(") A WHERE ROWNUM <=").append(endIndex).append(") WHERE RN > ").append(startIndex);
-		return changeInSQL(sb.toString());
-	}
+
+    public static String pageSql(String sql, PageModel model) {
+        StringBuilder sb = new  StringBuilder();
+        sb.append("SELECT * FROM ")
+                .append("(").append(sql).append(") temp_");
+
+        if (model != null && (StringUtils.isNotBlank(model.getSidx()) && StringUtils
+                .isNotBlank(model.getSord()))) {
+            sb.append(" ORDER BY ").append(model.getSidx()).append(" ")
+                    .append(model.getSord());
+        }
+
+        if (model != null)
+            sb.append(" limit ").append((model.getPage()-1) *  model.getRows()).append(",").append(model.getRows());
+
+        return sb.toString();
+    }
    
    public static String changeInSQL(String sql) {
 		Pattern pat = Pattern.compile(IN_FULL_REGIX);  

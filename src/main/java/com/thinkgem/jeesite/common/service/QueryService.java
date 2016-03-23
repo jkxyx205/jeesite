@@ -28,7 +28,7 @@ public class QueryService {
 
     public static final String PARAM_IN_SEPERATOR = ";";
 
-    private static final String SQL_ID = "sqlId";
+    private static final String QUERY_NAME = "queryName";
 
     private static final String PAGE_OBJECT_PROP = "page";
 
@@ -42,23 +42,23 @@ public class QueryService {
      * usually used by web site
      * @param request
      * @param response
-     * @param sqlId if the sqlId not in request params,you can specify yourself
+     * @param queryName if the queryName not in request params,you can specify yourself
      * @param supplementParams if some parmas not in request,you can specify yourself
      * @return
      * all the row in the list
      *  in map the key is the colunm lable and the value is cell value
      */
-    public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String sqlId, Map<String, Object> supplementParams)  {
+    public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String queryName, Map<String, Object> supplementParams)  {
         Map<String, Object> params  = getParametersAsMap(true, request);
         params.putAll(supplementParams);
-        if (StringUtils.isNotBlank(sqlId))
-            params.put(SQL_ID, sqlId);
+        if (StringUtils.isNotBlank(queryName))
+            params.put(QUERY_NAME, queryName);
 
         return findPage(new Page<Map<String, Object>>(request, response), params);
     }
 
-    public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String sqlId)   {
-        return findListByParams(request, response, sqlId, Collections.EMPTY_MAP);
+    public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String queryName)   {
+        return findListByParams(request, response, queryName, Collections.EMPTY_MAP);
     }
 
     public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response)  {
@@ -68,21 +68,20 @@ public class QueryService {
     /**
      * usually used by java code
      * @param params
-     * @param sqlId
+     * @param queryName
      * @return
      */
-    public List<Map<String, Object>> findListByParams(String sqlId, Map<String, Object> params)   {
+    public List<Map<String, Object>> findListByParams(String queryName, Map<String, Object> params)   {
         SqlSession session = sqlSessionFactory.openSession();
-
-        List<Map<String, Object>> list = session.selectList(sqlId, params);
+        List<Map<String, Object>> list = session.selectList(queryName, params);
         session.close();
         return  list;
     }
 
     private Page<Map<String, Object>> findPage(Page<Map<String, Object>> page, Map<String, Object> params)   {
-        String sqlId = (String)params.get(SQL_ID);
+        String queryName = (String)params.get(QUERY_NAME);
         params.put(PAGE_OBJECT_PROP, page);
-        List<Map<String, Object>> list = findListByParams(sqlId,params);
+        List<Map<String, Object>> list = findListByParams(queryName,params);
         page.setList(list);
         return  page;
     }
@@ -119,13 +118,13 @@ public class QueryService {
         return map;
     }
 
-    private String getQueryStringBySqlId(String sqlId, Map<String, Object> param) {
-        MappedStatement mappedStatement = sqlSessionFactory.getConfiguration().getMappedStatement(sqlId);
+    private String getQueryStringByqueryName(String queryName, Map<String, Object> param) {
+        MappedStatement mappedStatement = sqlSessionFactory.getConfiguration().getMappedStatement(queryName);
         String sql = mappedStatement.getBoundSql(param).getSql();
         return sql;
     }
 
-    public <T> T queryForSpecificParamSQL(String sql,
+    private <T> T queryForSpecificParamSQL(String sql,
                                           Map<String, Object> param,
                                           String paramInSeperator,
                                           JdbcTemplateExecutor<T> jdbcTemplateExecutor) {
@@ -135,7 +134,7 @@ public class QueryService {
 
         Object[] args = NamedParameterUtils.buildValueArray(formatSql,
                 formatMap);
-
+        formatSql = formatSql.replaceAll(SqlFormatter.PARAM_REGEX,"?"); //mysql
         return jdbcTemplateExecutor.query(jdbcTemplate, formatSql, args);
     }
 
@@ -149,13 +148,13 @@ public class QueryService {
     public <T> T queryForSpecificParam(String queryName,
                                        Map<String, Object> param, String paramInSeperator,
                                        JdbcTemplateExecutor<T> jdbcTemplateExecutor) {
-        String sql = getQueryStringBySqlId(queryName, param);
+        String sql = getQueryStringByqueryName(queryName, param);
         return  queryForSpecificParamSQL(sql, param, paramInSeperator,jdbcTemplateExecutor);
     }
 
     public long queryForSpecificParamCount(String queryName,
                                            Map<String, Object> param) {
-        String sql = getQueryStringBySqlId(queryName, param);
+        String sql = getQueryStringByqueryName(queryName, param);
         return  queryForSpecificParamSQL(sql, param, PARAM_IN_SEPERATOR,new JdbcTemplateExecutor<Long>() {
 
             @Override

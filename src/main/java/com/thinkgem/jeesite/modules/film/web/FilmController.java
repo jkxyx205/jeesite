@@ -3,11 +3,13 @@
  */
 package com.thinkgem.jeesite.modules.film.web;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.QueryService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.film.entity.Film;
+import com.thinkgem.jeesite.modules.film.service.FilmService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,13 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.film.entity.Film;
-import com.thinkgem.jeesite.modules.film.service.FilmService;
-
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -90,10 +88,34 @@ public class FilmController extends BaseController {
     @RequiresPermissions("film:film:view")
     @RequestMapping(value = "count")
     public String count(Film film, HttpServletRequest request, HttpServletResponse response, Model model) {
-        String sqlId = "com.thinkgem.jeesite.modules.film.dao.FilmDao.count";
-        Page<Map<String, Object>> page = queryService.findListByParams(request, response, sqlId);
+        String queryName = "com.thinkgem.jeesite.modules.film.dao.FilmDao.count";
+        Page<Map<String, Object>> page = queryService.findListByParams(request, response, queryName);
         model.addAttribute("page", page);
+
+/*        Map<String, Object> map =  queryService.queryForSpecificParam("com.thinkgem.jeesite.modules.film.dao.FilmDao.count", null,new QueryService.JdbcTemplateExecutor<Map<String, Object>>() {
+            @Override
+            public Map<String, Object> query(JdbcTemplate jdbcTemplate, String queryString, Object[] args) {
+                final Map<String, Object> dataMap = new HashMap<String, Object>();
+                jdbcTemplate.query(queryString, new RowCallbackHandler() {
+                    @Override
+                    public void processRow(ResultSet resultSet) throws SQLException {
+                        dataMap.put("filmType", resultSet.getString(1));
+                        dataMap.put("count", resultSet.getInt(2));
+                    }
+                },args);
+                return  dataMap;
+            }
+        });
+
+        System.out.println(map);*/
         return "modules/film/filmCount";
+    }
+
+
+    @RequiresPermissions("film:film:view")
+    @RequestMapping(value = "count2")
+    public String count2(Film film, HttpServletRequest request, HttpServletResponse response, Model model) {
+        return "modules/film/filmCount2";
     }
 
 }

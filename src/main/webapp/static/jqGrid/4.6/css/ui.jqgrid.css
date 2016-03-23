@@ -376,3 +376,7 @@ a.g-menu-item, a.soptclass, a.clearsearchclass { cursor: pointer; }
 .ui-jqgrid .ui-jqgrid-view select,
 .ui-jqgrid .ui-jqgrid-view textarea,
 .ui-jqgrid .ui-jqgrid-view button {font-size: 11px}
+
+#pager_center > table > tbody > tr > td:nth-child(4) > input {
+    width: 14px;
+}

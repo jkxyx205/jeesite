@@ -1,7 +1,9 @@
 package com.thinkgem.jeesite.common.web;
 
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.JqgridService;
 import com.thinkgem.jeesite.common.service.QueryService;
+import com.thinkgem.jeesite.common.vo.JqGrid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,9 +25,19 @@ public class QueryController {
     @Resource
     private QueryService queryService;
 
+    @Resource
+    private JqgridService jqgridService;
+
+    /**
+     * Page的实现方式，原生的实现方式
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "jqgridList")
     @ResponseBody
-    public Map<String, Object> memberList(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public Map<String, Object> pageList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Page<Map<String, Object>> page = queryService.findListByParams(request, response);
         Map<String, Object> jqGridJson = new HashMap<String, Object>(4);
 
@@ -39,5 +51,11 @@ public class QueryController {
         jqGridJson.put("records",page.getCount());
         jqGridJson.put("rows", page.getList());
         return jqGridJson;
+    }
+
+    @RequestMapping(value = "jqgridList2")
+    @ResponseBody
+    public JqGrid mapList(HttpServletRequest request) throws Exception {
+        return jqgridService.getJqgirdData(request);
     }
 }

@@ -118,5 +118,18 @@
         </where>
         GROUP BY film_type
     </select>
+
+    <select id="count2" resultType="map">
+        select film_type "filmType",
+        count(film_type) "count" from test_film
+        <where>
+            del_flag = '0'
+            /*AND film_type = :filmType*/
+            <if test="filmType != null and filmType != ''">
+                AND film_type = :filmType
+            </if>
+        </where>
+        GROUP BY film_type
+    </select>
 	
 </mapper>

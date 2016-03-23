@@ -166,7 +166,7 @@ public class SQLHelper {
     
     /** 
      * 去除qlString的select子句。 
-     * @param hql 
+     * @param qlString
      * @return 
      */  
     @SuppressWarnings("unused")
@@ -177,7 +177,7 @@ public class SQLHelper {
       
     /** 
      * 去除hql的orderBy子句。 
-     * @param hql 
+     * @param qlString
      * @return 
      */  
     @SuppressWarnings("unused")

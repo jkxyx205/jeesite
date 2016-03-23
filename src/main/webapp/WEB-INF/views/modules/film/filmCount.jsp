@@ -17,11 +17,7 @@
 	</script>
 </head>
 <body>
-	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/film/film/count">电影列表</a></li>
-		<shiro:hasPermission name="film:film:edit"><li><a href="${ctx}/film/film/form">电影添加</a></li></shiro:hasPermission>
-	</ul>
-    <form:form id="searchForm" modelAttribute="film" action="${ctx}/film/film/" method="post" class="breadcrumb form-search">
+    <form:form id="searchForm" modelAttribute="film" action="${ctx}/film/film/count" method="post" class="breadcrumb form-search">
         <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
         <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
         <ul class="ul-form">
