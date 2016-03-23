@@ -31,7 +31,7 @@
 		FROM test_film a
 		<include refid="filmJoins"/>
 		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
+			a.del_flag = 0
 			<if test="filmName != null and filmName != ''">
 				AND a.film_name = #{filmName}
 			</if>
@@ -48,6 +48,28 @@
 			</otherwise>
 		</choose>
 	</select>
+
+    <select id="findList2" resultType="map">
+        SELECT
+        <include refid="filmColumns"/>
+        FROM test_film a
+        <include refid="filmJoins"/>
+        <where>
+            a.del_flag = 0
+            AND a.film_name in (:filmName)
+            <if test="filmType != null and filmType != ''">
+                AND a.film_type = :filmType
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
 	
 	<select id="findAllList" resultType="Film">
 		SELECT 

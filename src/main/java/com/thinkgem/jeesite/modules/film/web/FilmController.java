@@ -38,7 +38,7 @@ public class FilmController extends BaseController {
 
     @Resource
     private QueryService queryService;
-	
+
 	@ModelAttribute
 	public Film get(@RequestParam(required=false) String id) {
 		Film entity = null;
@@ -58,6 +58,15 @@ public class FilmController extends BaseController {
 		model.addAttribute("page", page);
 		return "modules/film/filmList";
 	}
+
+    @RequiresPermissions("film:film:view")
+    @RequestMapping(value = "list2")
+    public String list2(Film film, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+        String queryName = "com.thinkgem.jeesite.modules.film.dao.FilmDao.findList2";
+        Page<Map<String, Object>> page = queryService.findListByParams2(request, response, queryName);
+        model.addAttribute("page", page);
+        return "modules/film/filmList2";
+    }
 
 	@RequiresPermissions("film:film:view")
 	@RequestMapping(value = "form")

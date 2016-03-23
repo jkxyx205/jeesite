@@ -130,8 +130,8 @@ public class Page<T> {
 	public Page(int pageNo, int pageSize, long count, List<T> list) {
 		this.setCount(count);
 		this.setPageNo(pageNo);
-		this.pageSize = pageSize;
-		this.list = list;
+		this.setPageSize(pageSize);
+		this.setList(list);
 	}
 	
 	/**

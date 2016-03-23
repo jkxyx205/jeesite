@@ -2,6 +2,8 @@ package com.thinkgem.jeesite.common.service;
 
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.SQL.SqlFormatter;
+import com.thinkgem.jeesite.common.vo.JqGrid;
+import com.thinkgem.jeesite.common.vo.PageModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.SqlSession;
@@ -38,6 +40,9 @@ public class QueryService {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
+    @Resource
+    private JqgridService jqgridService;
+
     /***
      * usually used by web site
      * @param request
@@ -57,8 +62,36 @@ public class QueryService {
         return findPage(new Page<Map<String, Object>>(request, response), params);
     }
 
+    /***
+     * mybatis 查询模式
+     * @param request
+     * @param response
+     * @param queryName
+     * @return
+     */
     public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response, String queryName)   {
         return findListByParams(request, response, queryName, Collections.EMPTY_MAP);
+    }
+
+    /**
+     * jdbcTemplate 查询模式 支持in 不定参数查询
+     * @param request
+     * @param response
+     * @param queryName
+     * @return
+     * @throws Exception
+     */
+    public Page<Map<String, Object>> findListByParams2(HttpServletRequest request,HttpServletResponse response, String queryName) throws Exception {
+        Page<Map<String, Object>> page = new Page<Map<String, Object>>(request, response);
+        Map<String,Object> params = QueryService.getParametersAsMap(true,request);
+        PageModel pageModel = new PageModel();
+        pageModel.setQueryName(queryName);
+        pageModel.setPage(page.getPageNo());
+        pageModel.setRows(page.getPageSize());
+        JqGrid jqGrid = jqgridService.getJqgirdData(pageModel,params);
+        page.setCount(jqGrid.getRecords());
+        page.setList(jqGrid.getRows());
+        return page;
     }
 
     public Page<Map<String, Object>> findListByParams(HttpServletRequest request,HttpServletResponse response)  {

@@ -1,18 +1,15 @@
 package com.thinkgem.jeesite.common.web;
 
-import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.JqgridService;
-import com.thinkgem.jeesite.common.service.QueryService;
 import com.thinkgem.jeesite.common.vo.JqGrid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Rick on 2016/3/20.
@@ -21,21 +18,21 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/common")
 public class QueryController {
+    private static final transient Logger logger = LoggerFactory.getLogger(QueryController.class);
 
-    @Resource
-    private QueryService queryService;
+   /* @Resource
+    private QueryService queryService;*/
 
     @Resource
     private JqgridService jqgridService;
-
-    /**
+ /*   *//**
      * Page的实现方式，原生的实现方式
      * @param request
-     * @param response
+     * @param
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "jqgridList")
+    /*@RequestMapping(value = "jqgridList")
     @ResponseBody
     public Map<String, Object> pageList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Page<Map<String, Object>> page = queryService.findListByParams(request, response);
@@ -51,7 +48,7 @@ public class QueryController {
         jqGridJson.put("records",page.getCount());
         jqGridJson.put("rows", page.getList());
         return jqGridJson;
-    }
+    }*/
 
     @RequestMapping(value = "jqgridList2")
     @ResponseBody
