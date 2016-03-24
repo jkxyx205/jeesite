@@ -5,12 +5,10 @@ package com.thinkgem.jeesite.common.vo;
  */
 public class PageModel {
     private int page;
-    int rows;
-    String sidx;
-    String sord;
-    String queryName;
-    //一次性全部加载出来,不再分页
-    String reloadAll;
+    private int rows;    //rows == -1 一次性全部加载出来,不再分页
+    private String sidx;
+    private String sord;
+    private String queryName;
 
     public int getPage() {
         return page;
@@ -50,13 +48,5 @@ public class PageModel {
 
     public void setQueryName(String queryName) {
         this.queryName = queryName;
-    }
-
-    public String getReloadAll() {
-        return reloadAll;
-    }
-
-    public void setReloadAll(String reloadAll) {
-        this.reloadAll = reloadAll;
     }
 }

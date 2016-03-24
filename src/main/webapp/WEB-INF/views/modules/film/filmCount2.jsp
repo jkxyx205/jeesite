@@ -17,6 +17,7 @@
             </li>
             <li class="btns"><input name="query" class="btn btn-primary" type="button" value="查询"/></li>
             <li class="btns"><input name="export" class="btn btn-primary" type="button" value="导出"/></li>
+            <li class="btns"><input name="export2" onclick="report();" class="btn btn-primary" type="button" value="导出2"/></li>
             <li class="clearfix"></li>
         </ul>
     </form:form>
@@ -29,10 +30,11 @@
   <script src="${ctxStatic}/jqGrid/4.6/i18n/grid.locale-cn.js"></script>
   <script src="${ctxStatic}/jqGrid/4.6/js/jquery.jqGrid.min.js"></script>
   <script src="${ctxStatic}/common/jquery.jqgrid.form.js"></script>
+  <script src="${ctxStatic}/common/jquery.report.js"></script>
   <script>
     $('#list').jqGridForm({
         queryName:'com.thinkgem.jeesite.modules.film.dao.FilmDao.count',
-        url:"${ctx}/common/jqgridList",
+        //url:"${ctx}/common/list", //default list
         formId:"searchForm",
         colNames:['电影类型','数量'],
         colModel:[
@@ -41,10 +43,9 @@
             ]
          });
 
-
     $('#list2').jqGridForm({
         queryName:'com.thinkgem.jeesite.modules.film.dao.FilmDao.count2',
-        url:"${ctx}/common/jqgridList2",
+        url:"${ctx}/common/list2",
         formId:"searchForm",
         pager:"pager2",
         colNames:['电影类型','数量'],
@@ -53,6 +54,23 @@
             {name:'count',index:'count', frozen : true}
         ]
     });
+
+    function report() {
+        $.fn.report({
+            url:"${ctx}/common/report",
+            queryName:"com.thinkgem.jeesite.modules.film.dao.FilmDao.findList2",
+            fileName:"test",
+            postData : {
+                //"filmName" : "",
+                "filmType"   : "0"
+            },
+            colNames:['电影类型','数量'],
+            colModel:[
+                {name:'filmType',format:'string'},
+                {name:'filmName',format:'string'}
+            ]
+        });
+    }
   </script>
 </body>
 </html>

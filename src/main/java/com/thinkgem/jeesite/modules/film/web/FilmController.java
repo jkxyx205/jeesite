@@ -63,7 +63,7 @@ public class FilmController extends BaseController {
     @RequestMapping(value = "list2")
     public String list2(Film film, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         String queryName = "com.thinkgem.jeesite.modules.film.dao.FilmDao.findList2";
-        Page<Map<String, Object>> page = queryService.findListByParams2(request, response, queryName);
+        Page<Map<String, Object>> page = queryService.findPageByParams2(request, response, queryName);
         model.addAttribute("page", page);
         return "modules/film/filmList2";
     }
@@ -98,7 +98,7 @@ public class FilmController extends BaseController {
     @RequestMapping(value = "count")
     public String count(Film film, HttpServletRequest request, HttpServletResponse response, Model model) {
         String queryName = "com.thinkgem.jeesite.modules.film.dao.FilmDao.count";
-        Page<Map<String, Object>> page = queryService.findListByParams(request, response, queryName);
+        Page<Map<String, Object>> page = queryService.findPageByParams(request, response, queryName);
         model.addAttribute("page", page);
 
 /*        Map<String, Object> map =  queryService.queryForSpecificParam("com.thinkgem.jeesite.modules.film.dao.FilmDao.count", null,new QueryService.JdbcTemplateExecutor<Map<String, Object>>() {

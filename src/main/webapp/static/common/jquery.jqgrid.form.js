@@ -78,7 +78,7 @@
     };
 
     $.fn.jqGridForm.defaults = {
-        url:ctx + '/common/jqgridList2',
+        url:ctx + '/common/list',
         datatype: "json",
         mtype: 'POST',
         //rowList:[10,20,30],

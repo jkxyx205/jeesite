@@ -21,25 +21,41 @@ public class JqgridService {
     private static final String JQGIRD_PARAM_PAGE = "page";
     private static final String JQGIRD_PARAM_ROW = "rows";
     private static final String JQGIRD_PARAM_QUERYNAME = "queryName";
-    private static final String JQGIRD_PARAM_RELOADALL = "reloadAll";
     private static final String JQGIRD_PARAM_SIDX = "sidx";
 
     @Resource
-    private QueryService queryService;
+    private JdbcTemplateService  JdbcTemplateService;
 
     public JqGrid getJqgirdData(HttpServletRequest request) throws Exception {
-        Map<String,Object> param = QueryService.getParametersAsMap(true, request);
+        Map<String,Object> param = JdbcTemplateService.getParametersAsMap(true, request);
         PageModel model = getPageModel(param);
         return getJqgirdData(model,param);
 
     }
     public JqGrid getJqgirdData(final PageModel model,Map<String,Object> param) throws Exception {
-        List<Map<String, Object>> rows = queryService.queryForSpecificParam(model.getQueryName(), param, new QueryService.JdbcTemplateExecutor<List<Map<String, Object>>>() {
+        long count = 0;
+
+        if (model.getRows() != -1) {
+            count = JdbcTemplateService.queryForSpecificParam(model.getQueryName(), param, new JdbcTemplateService.JdbcTemplateExecutor<Long>() {
+
+                @Override
+                public Long query(JdbcTemplate jdbcTemplate, String queryString, Object[] args) {
+                    queryString = SqlFormatter.formatSqlCount(queryString);
+                    return jdbcTemplate.queryForObject(queryString, args, Long.class);
+                }
+            });
+
+            if (model.getRows() >= count){
+                model.setPage(1);
+            }
+        }
+
+        List<Map<String, Object>> rows = JdbcTemplateService.queryForSpecificParam(model.getQueryName(), param, new JdbcTemplateService.JdbcTemplateExecutor<List<Map<String, Object>>>() {
 
             public List<Map<String, Object>> query(JdbcTemplate jdbcTemplate,
                                                    String queryString, Object[] args) {
                 queryString = wrapSordString(queryString, model.getSidx(), model.getSord());
-                if(!BOOLEAN_TRUE.equals(model.getReloadAll())) {
+                if(model.getRows() != -1) {
                     queryString = pageSql(queryString,model);
                 }
                 //
@@ -50,27 +66,15 @@ public class JqgridService {
 
             }
         });
-
-        long count;
-
-        if(BOOLEAN_TRUE.equals(model.getReloadAll())) {
+        if(model.getRows() == -1) {
             count = rows.size();
-        } else {
-            count = queryService.queryForSpecificParam(model.getQueryName(), param, new QueryService.JdbcTemplateExecutor<Long>() {
-
-                @Override
-                public Long query(JdbcTemplate jdbcTemplate, String queryString, Object[] args) {
-                    queryString = SqlFormatter.formatSqlCount(queryString);
-                    return jdbcTemplate.queryForObject(queryString, args, Long.class);
-                }
-            });
         }
 
         JqGrid bo = new JqGrid();
 
         long total;
 
-        if(!BOOLEAN_TRUE.equals(model.getReloadAll())) {
+        if(model.getRows() != -1) {
             if(count%model.getRows() == 0) {
                 total = count/model.getRows();
             } else {
@@ -130,12 +134,17 @@ public class JqgridService {
     private PageModel getPageModel(Map<String,Object> param) {
         PageModel model = new PageModel();
         model.setQueryName((String) param.get(JQGIRD_PARAM_QUERYNAME));
-        model.setReloadAll((String) param.get(JQGIRD_PARAM_RELOADALL));
+        if (param.get(JQGIRD_PARAM_PAGE) == null) param.put(JQGIRD_PARAM_PAGE,"1");
+        if (param.get(JQGIRD_PARAM_ROW) == null) param.put(JQGIRD_PARAM_ROW,"-1");
+        model.setPage(Integer.parseInt(param.get(JQGIRD_PARAM_PAGE).toString()));
+        model.setRows(Integer.parseInt(param.get(JQGIRD_PARAM_ROW).toString()));
 
-        if(!BOOLEAN_TRUE.equals(model.getReloadAll())) { //需要分页操作
+        //model.setReloadAll((String) param.get(JQGIRD_PARAM_RELOADALL));
+
+        /*if(!BOOLEAN_TRUE.equals(model.getReloadAll())) { //需要分页操作
             model.setPage(Integer.parseInt(param.get(JQGIRD_PARAM_PAGE).toString()));
             model.setRows(Integer.parseInt(param.get(JQGIRD_PARAM_ROW).toString()));
-        }
+        }*/
 
         model.setSord((String) param.get(JQGIRD_PARAM_SORD));
         model.setSidx((String) param.get(JQGIRD_PARAM_SIDX));
@@ -150,8 +159,7 @@ public class JqgridService {
         return SqlFormatter.pageSql(sql,model);
     }
 
-    private static final String BOOLEAN_TRUE = "true";
+   /* private static final String BOOLEAN_TRUE = "true";
 
-    @SuppressWarnings("unused")
-    private static final String BOOLEAN_FALSE = "false";
+    private static final String BOOLEAN_FALSE = "false";*/
 }
