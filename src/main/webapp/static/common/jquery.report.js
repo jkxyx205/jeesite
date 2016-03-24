@@ -9,7 +9,7 @@
     }
 
     $.fn.report.defaults = {
-        url:ctx + '/common/list'
+        url:ctx + '/common/report'
     };
 
     function request(url,data) {

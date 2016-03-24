@@ -1,2 +1,4 @@
 1. sql中order by 参数1 参数2
 在获取getCount中，会自动去除排序语句
+
+2. page setCount必须在setList之前

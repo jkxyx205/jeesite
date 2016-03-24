@@ -89,3 +89,7 @@ input.btn:hover {*color:#333333}
 #left,#right,#openClose {float:left;} #openClose {width:6px;margin:0 1px;cursor:pointer;}
 #openClose,#openClose.close {background:#efefef url("../images/openclose.png") no-repeat -29px center;}
 #openClose.close {background-position:1px center;opacity:0.5;filter:alpha(opacity=50)}
+
+#pager2_center > table > tbody > tr > td:nth-child(4) > input {
+    width: 14px;
+}

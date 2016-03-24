@@ -37,6 +37,13 @@ public class CommonController {
 
     @Resource
     private ReportService reportService;
+
+    @RequestMapping(value = "list",method=RequestMethod.POST)
+    @ResponseBody
+    public JqGrid mapList(HttpServletRequest request) throws Exception {
+        return jqgridService.getJqgirdData(request);
+    }
+
     /**
      * Page的实现方式，原生的实现方式
      * @param request
@@ -44,7 +51,7 @@ public class CommonController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "list")
+    @RequestMapping(value = "list2")
     @ResponseBody
     public Map<String, Object> pageList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Page<Map<String, Object>> page = queryService.findPageByParams(request, response);
@@ -59,12 +66,6 @@ public class CommonController {
         jqGridJson.put("records",page.getCount());
         jqGridJson.put("rows", page.getList());
         return jqGridJson;
-    }
-
-    @RequestMapping(value = "list2",method=RequestMethod.POST)
-    @ResponseBody
-    public JqGrid mapList(HttpServletRequest request) throws Exception {
-        return jqgridService.getJqgirdData(request);
     }
 
     @RequestMapping(value = "report",method= RequestMethod.POST)

@@ -13,28 +13,44 @@
         constructor: Grid,
         init: function() {
             var o = this;
+
             this.options.serializeGridData = function(postData) {
-                postData.queryName =o.options.queryName;
+                postData.queryName = o.options.queryName;
+                postData.dict = getDicMap(o.$element);
                 return postData;
             };
 
             this.grid = this.$element.jqGrid(this.options);
-            $(window).resize(function(){
+           /* $(window).resize(function(){
                 o.grid.jqGrid('setGridWidth',$(window).width()-100);
                 o.grid.jqGrid('setGridHeight',$(window).height()/2-100);
-            }).resize();
+            }).resize();*/
             var $form = $('#'+ this.options.formId);
             $form.find('input[name=query]').bind('click', function() {
                 query($form, o.grid);
             });
             $form.find('input[name=export]').bind('click', function() {
-                //exportGrid(o);
+                exportGrid($form,o.grid,o.options);
             });
         },
         getGrid: function() {
             return this.grid;
         }
     };
+
+    function getDicMap($grid) {
+        var colModel = $grid.jqGrid("getGridParam","colModel");
+        var len = colModel.length;
+        var dicMap = {};
+        for (var i = 0; i < len; i++) {
+            var model = colModel[i];
+            if (model.dict != undefined) {
+                dicMap[model.name] = model.dict;
+            }
+        }
+
+        return JSON.stringify(dicMap);
+    }
 
     function getFormParams($form) {
         return param = $form.form2json({allowEmptyMultiVal:true});
@@ -44,8 +60,30 @@
         $grid.jqGrid("setGridParam", {postData:getFormParams($form)}).trigger("reloadGrid", [{page:1}]);
     }
 
-    function exportGrid(o) {
-        alert(o);
+    function exportGrid($form,$grid,options) {
+        //ignore hidden == true
+        var colNames = $grid.jqGrid("getGridParam","colNames");
+        var colModel = $grid.jqGrid("getGridParam","colModel");
+        var _colNames = [];
+        var _colModel = [];
+        var len = colModel.length;
+        debugger;
+        for (var i = 0; i < len; i++) {
+            var model = colModel[i];
+            if (model.hidden != true && model.name != "rn" && model.name != "cb") {
+                _colNames.push(colNames[i]);
+                _colModel.push(colModel[i]);
+            }
+        }
+        $.fn.report({
+            queryName:options.queryName,
+            fileName:options.fileName,
+            sidx:$grid.jqGrid("getGridParam","sortname"),
+            sord:$grid.jqGrid("getGridParam","sortorder"),
+            postData : getFormParams($form),
+            colNames:_colNames,
+            colModel:_colModel
+        });
     }
 
     $.fn.jqGridForm = function(options) {

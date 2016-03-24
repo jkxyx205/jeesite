@@ -1,5 +1,7 @@
 package com.thinkgem.jeesite.common.vo;
 
+import java.util.Map;
+
 /**
  * Created by Rick.Xu on 2016/03/22.
  */
@@ -9,6 +11,7 @@ public class PageModel {
     private String sidx;
     private String sord;
     private String queryName;
+    private Map<String,String> dicMap;
 
     public int getPage() {
         return page;
@@ -48,5 +51,13 @@ public class PageModel {
 
     public void setQueryName(String queryName) {
         this.queryName = queryName;
+    }
+
+    public Map<String, String> getDicMap() {
+        return dicMap;
+    }
+
+    public void setDicMap(Map<String, String> dicMap) {
+        this.dicMap = dicMap;
     }
 }

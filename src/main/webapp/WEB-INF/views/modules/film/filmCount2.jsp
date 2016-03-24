@@ -9,6 +9,9 @@
 <body>
   <form:form id="searchForm" modelAttribute="film"  class="breadcrumb form-search">
         <ul class="ul-form">
+            <li><label>电影名称：</label>
+                <form:input path="filmName" htmlEscape="false" maxlength="64" class="input-medium"/>
+            </li>
             <li><label>电影类型：</label>
                 <form:select path="filmType" class="input-medium">
                     <form:option value="" label=""/>
@@ -32,42 +35,47 @@
   <script src="${ctxStatic}/common/jquery.jqgrid.form.js"></script>
   <script src="${ctxStatic}/common/jquery.report.js"></script>
   <script>
-    $('#list').jqGridForm({
+      $('#list').jqGridForm({
+          queryName:'com.thinkgem.jeesite.modules.film.dao.FilmDao.findList3',
+          url:"${ctx}/common/list",
+          fileName:'export',
+          formId:"searchForm",
+          pager:"pager2",
+          colNames:['电影类型','电影名称'],
+          colModel:[
+              {name:'filmType',index:'filmType', sortable:true, frozen : true,dict:'film_type'},
+              {name:'filmName',index:'filmName', frozen : true}
+          ]
+      });
+
+   /* $('#list2').jqGridForm({
         queryName:'com.thinkgem.jeesite.modules.film.dao.FilmDao.count',
-        //url:"${ctx}/common/list", //default list
+        //url:"${ctx}/common/list2", //default list
         formId:"searchForm",
         colNames:['电影类型','数量'],
         colModel:[
             {name:'filmType',index:'filmType', sortable:true, frozen : true},
             {name:'count',index:'count', frozen : true}
             ]
-         });
+         });*/
 
-    $('#list2').jqGridForm({
-        queryName:'com.thinkgem.jeesite.modules.film.dao.FilmDao.count2',
-        url:"${ctx}/common/list2",
-        formId:"searchForm",
-        pager:"pager2",
-        colNames:['电影类型','数量'],
-        colModel:[
-            {name:'filmType',index:'filmType', sortable:true, frozen : true},
-            {name:'count',index:'count', frozen : true}
-        ]
-    });
-
+    //手动report
     function report() {
         $.fn.report({
             url:"${ctx}/common/report",
             queryName:"com.thinkgem.jeesite.modules.film.dao.FilmDao.findList2",
             fileName:"test",
+            sidx:'filmType',
+            sord:'desc',
             postData : {
                 //"filmName" : "",
-                "filmType"   : "0"
+                //"filmType"   : "0"
             },
-            colNames:['电影类型','数量'],
+            colNames:['电影类型','电影名称'],
             colModel:[
-                {name:'filmType',format:'string'},
-                {name:'filmName',format:'string'}
+                {name:'filmType',formatter:'string',dict:'film_type'},
+                {name:'filmName',formatter:'string'},
+                {name:'score',formatter:'string'}
             ]
         });
     }

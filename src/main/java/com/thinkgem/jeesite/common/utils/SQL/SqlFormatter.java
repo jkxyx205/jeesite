@@ -1,5 +1,6 @@
 package com.thinkgem.jeesite.common.utils.SQL;
 
+import com.thinkgem.jeesite.common.persistence.interceptor.SQLHelper;
 import com.thinkgem.jeesite.common.vo.PageModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -148,7 +149,7 @@ public class SqlFormatter {
 //		srcSql = srcSql.replaceAll("(?i)(order.*(asc|desc))","");
 
 		StringBuilder sb = new  StringBuilder();
-		sb.append("SELECT COUNT(*) FROM (").append(srcSql).append(") temp");
+		sb.append("SELECT COUNT(*) FROM (").append(SQLHelper.removeOrders(srcSql)).append(") temp");
 		return sb.toString();
 	}
 	
@@ -211,11 +212,11 @@ public class SqlFormatter {
         sb.append("SELECT * FROM ")
                 .append("(").append(sql).append(") temp_");
 
-        if (model != null && (StringUtils.isNotBlank(model.getSidx()) && StringUtils
+        /*if (model != null && (StringUtils.isNotBlank(model.getSidx()) && StringUtils
                 .isNotBlank(model.getSord()))) {
             sb.append(" ORDER BY ").append(model.getSidx()).append(" ")
                     .append(model.getSord());
-        }
+        }*/
 
         if (model != null)
             sb.append(" limit ").append((model.getPage()-1) *  model.getRows()).append(",").append(model.getRows());

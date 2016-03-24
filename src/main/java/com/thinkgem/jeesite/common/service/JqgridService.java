@@ -3,14 +3,20 @@ package com.thinkgem.jeesite.common.service;
 import com.thinkgem.jeesite.common.utils.SQL.SqlFormatter;
 import com.thinkgem.jeesite.common.vo.JqGrid;
 import com.thinkgem.jeesite.common.vo.PageModel;
+import com.thinkgem.jeesite.common.vo.ReportPageModel;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Rick.Xu on 2016/03/22.
@@ -22,6 +28,7 @@ public class JqgridService {
     private static final String JQGIRD_PARAM_ROW = "rows";
     private static final String JQGIRD_PARAM_QUERYNAME = "queryName";
     private static final String JQGIRD_PARAM_SIDX = "sidx";
+    private static final String DICT_TYPE = "dict";
 
     @Resource
     private JdbcTemplateService  JdbcTemplateService;
@@ -61,7 +68,7 @@ public class JqgridService {
                 //
                 //return jdbcTemplate.queryForList(sql, args);
                 List<Map<String, Object>>  ret = jdbcTemplate.queryForList(queryString, args);
-                //translate(ret);
+                translate(ret, model.getDicMap());
                 return ret;
 
             }
@@ -90,17 +97,21 @@ public class JqgridService {
         return bo;
     }
 
-    /*private void translate(List<Map<String, Object>>  ret) {
+    private void translate(List<Map<String, Object>>  ret, Map<String, String> dicMap) {
+        if (dicMap == null) return;
+
         for(Map<String, Object> m: ret) {
             Set<String> names = m.keySet();
             for(String name : names) {
-                Object value = translate(name, m.get(name));
-                m.put(name, value);
+                if (dicMap.containsKey(name)) {
+                    Object value = translate(dicMap.get(name), m.get(name));
+                    m.put(name, value);
+                }
             }
         }
-    }*/
+    }
 
-    private String wrapSordString(String sql,String sidx, String sord) {
+    public static String wrapSordString(String sql,String sidx, String sord) {
         StringBuilder sb = new StringBuilder("SELECT * FROM (");
         sb.append(sql).append(") temp");
         if(StringUtils.isNotBlank(sidx) && StringUtils.isNotBlank(sord)) {
@@ -110,28 +121,22 @@ public class JqgridService {
             return sql;
         }
     }
-    /*private Object translate(String name,Object value) {
+    private Object translate(String dict,Object value) {
         if(value!= null && (value.getClass() == String.class)) {
             String v = (String)value;
             if(StringUtils.isNotBlank(v)) {
                 String[] vs = v.split(",");
                 if(vs.length == 1) {
-                    return DictionaryUtils.getTrueValueByKeyorAlias(name, v);
+                    return DictUtils.getDictLabel((String)value,dict,"");
                 } else {
-                    StringBuilder lang = new StringBuilder();
-                    for (String vv : vs) {
-                        lang.append(DictionaryUtils.getTrueValueByKeyorAlias(name, vv)).append(",");
-                    }
-                    lang.deleteCharAt(lang.length()-1);
-                    return lang.toString();
+                    return DictUtils.getDictLabels((String)value,dict,"");
                 }
             }
         }
-
         return value;
-    }*/
+    }
 
-    private PageModel getPageModel(Map<String,Object> param) {
+    private PageModel getPageModel(Map<String,Object> param) throws IOException {
         PageModel model = new PageModel();
         model.setQueryName((String) param.get(JQGIRD_PARAM_QUERYNAME));
         if (param.get(JQGIRD_PARAM_PAGE) == null) param.put(JQGIRD_PARAM_PAGE,"1");
@@ -139,15 +144,11 @@ public class JqgridService {
         model.setPage(Integer.parseInt(param.get(JQGIRD_PARAM_PAGE).toString()));
         model.setRows(Integer.parseInt(param.get(JQGIRD_PARAM_ROW).toString()));
 
-        //model.setReloadAll((String) param.get(JQGIRD_PARAM_RELOADALL));
-
-        /*if(!BOOLEAN_TRUE.equals(model.getReloadAll())) { //需要分页操作
-            model.setPage(Integer.parseInt(param.get(JQGIRD_PARAM_PAGE).toString()));
-            model.setRows(Integer.parseInt(param.get(JQGIRD_PARAM_ROW).toString()));
-        }*/
-
         model.setSord((String) param.get(JQGIRD_PARAM_SORD));
         model.setSidx((String) param.get(JQGIRD_PARAM_SIDX));
+
+        ObjectMapper mapper = new ObjectMapper();
+        model.setDicMap(mapper.readValue((String)param.get(DICT_TYPE), Map.class));
 
         return model;
     }
@@ -158,8 +159,4 @@ public class JqgridService {
         }
         return SqlFormatter.pageSql(sql,model);
     }
-
-   /* private static final String BOOLEAN_TRUE = "true";
-
-    private static final String BOOLEAN_FALSE = "false";*/
 }

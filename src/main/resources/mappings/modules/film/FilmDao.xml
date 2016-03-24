@@ -11,7 +11,8 @@
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
-		a.remarks AS "remarks"
+		a.remarks AS "remarks",
+		12.3 as "score"
 	</sql>
 	
 	<sql id="filmJoins">
@@ -70,6 +71,20 @@
             </otherwise>
         </choose>
     </select>
+
+    <select id="findList3" resultType="map">
+        SELECT
+        <include refid="filmColumns"/>
+        FROM test_film a
+        <include refid="filmJoins"/>
+        <where>
+            a.del_flag = 0
+            AND a.film_name in (:filmName)
+            AND a.film_type = :filmType
+        </where>
+    </select>
+
+
 	
 	<select id="findAllList" resultType="Film">
 		SELECT 
