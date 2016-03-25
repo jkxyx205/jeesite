@@ -3,10 +3,8 @@ package com.thinkgem.jeesite.common.service;
 import com.thinkgem.jeesite.common.utils.SQL.SqlFormatter;
 import com.thinkgem.jeesite.common.vo.JqGrid;
 import com.thinkgem.jeesite.common.vo.PageModel;
-import com.thinkgem.jeesite.common.vo.ReportPageModel;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -148,7 +146,9 @@ public class JqgridService {
         model.setSidx((String) param.get(JQGIRD_PARAM_SIDX));
 
         ObjectMapper mapper = new ObjectMapper();
-        model.setDicMap(mapper.readValue((String)param.get(DICT_TYPE), Map.class));
+        Object dicString = param.get(DICT_TYPE);
+        if (dicString != null)
+            model.setDicMap(mapper.readValue((String)dicString, Map.class));
 
         return model;
     }

@@ -123,7 +123,6 @@ public class ReportService {
     }
 
     public static OutputStream getOsFromResponse(HttpServletResponse response,HttpServletRequest request, String fileName) throws IOException {
-        OutputStream os = null;
         String _fileName = fileName.replaceAll("[\\/:*?\"<>[|]]", "");
 
         String browserType = request.getHeader("User-Agent").toLowerCase();
@@ -145,7 +144,7 @@ public class ReportService {
 
         response.setHeader("Content-disposition", "attachment; filename="+_fileName+"");// 设定输出文件头
         response.setContentType("application/vnd.ms-excel;charset="+DEFAULT_ENCODING+"");// 定义输出类型
-        os = response.getOutputStream(); // 取得输出流
+        OutputStream os = response.getOutputStream(); // 取得输出流
         return os;
     }
 }

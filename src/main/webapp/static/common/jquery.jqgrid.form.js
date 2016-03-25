@@ -21,10 +21,10 @@
             };
 
             this.grid = this.$element.jqGrid(this.options);
-           /* $(window).resize(function(){
+            $(window).resize(function(){
                 o.grid.jqGrid('setGridWidth',$(window).width()-100);
-                o.grid.jqGrid('setGridHeight',$(window).height()/2-100);
-            }).resize();*/
+                //o.grid.jqGrid('setGridHeight',$(window).height()/2-100);
+            }).resize();
             var $form = $('#'+ this.options.formId);
             $form.find('input[name=query]').bind('click', function() {
                 query($form, o.grid);
